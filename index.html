@@ -635,6 +635,11 @@
     .v4-reveal { opacity: 1; transform: none; }
   }
   @media (max-width: 1100px) {
+    .v4-nav .v4-inner { width: calc(100% - 32px); }
+    .v4-brand strong { font-size: 22px; }
+    .v4-links { font-size: 14px; }
+    .v4-links a { padding: 0 8px; }
+    .v4-links em { margin-left: 4px; padding-left: 12px; }
     .v4-quick-dock {
       top: auto;
       right: auto;
@@ -656,9 +661,24 @@
   }
   @media (max-width: 900px) {
     .v4-inner, .v4-wide, .v4-hero-copy { width: min(100% - 36px, 1900px); }
+    .v4-nav .v4-inner {
+      width: 100%;
+      min-height: 0;
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px 18px 8px;
+    }
     .nav-helix { display: none; }
-    .v4-links a { display: none; }
-    .v4-links { gap: 0; }
+    .v4-links {
+      width: 100%;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      white-space: nowrap;
+    }
+    .v4-links a { min-height: 36px; flex: 0 0 auto; }
+    .v4-links em { flex: 0 0 auto; line-height: 36px; }
     .v4-brand { gap: 10px; }
     .v4-brand img { width: 46px; height: 46px; flex-basis: 46px; }
     .v4-brand strong { font-size: 17px; white-space: normal; }
@@ -741,7 +761,7 @@
         </svg>
       </div>
       <div class="v4-links">
-        <a class="active" href="#v4-home">首页</a><a href="#v4-research">研究方向</a><a href="#v4-latest">最新进展</a><a href="#v4-team">团队成员</a><a href="#v4-join">加入我们</a><em>EN</em>
+        <a class="active" href="./index.html" aria-current="page">首页</a><a href="./research.html">研究方向</a><a href="./updates.html">最新进展</a><a href="./members.html">团队成员</a><a href="./databases.html">数据库</a><a href="./tools.html">在线工具</a><a href="./join.html">加入我们</a><em>EN</em>
       </div>
     </div>
   </nav>
@@ -753,7 +773,7 @@
         <span class="v4-kicker">One Health · 同一健康</span>
         <h3>追踪病原演化，<br>守护共同健康</h3>
         <p>聚焦人兽共患病原的传播、演化与宿主互作，以机器学习和多组学分析服务疾病监测、预警及防控。</p>
-        <div class="v4-actions"><a>探索研究方向</a><a>加入我们</a></div>
+        <div class="v4-actions"><a href="./research.html">探索研究方向</a><a href="./join.html">加入我们</a></div>
       </div>
     </section>
 
@@ -771,7 +791,7 @@
         <span class="v4-kicker">Pathogen surveillance</span>
         <h3>从多源数据中，<br>发现早期风险信号</h3>
         <p>连接病原基因组、流行病学与环境数据，识别新发病原和异常传播信号。</p>
-        <div class="v4-actions"><a>监测与预警</a><a>了解方法</a></div>
+        <div class="v4-actions"><a href="./research.html">监测与预警</a><a href="./tools.html">了解方法</a></div>
       </div>
     </section>
 
@@ -790,7 +810,7 @@
         <span class="v4-kicker">Machine learning × Multi-omics</span>
         <h3>解析致病与耐药，<br>寻找干预线索</h3>
         <p>利用机器学习和多组学分析理解病原—媒介/环境—宿主互作，并挖掘关键生物活性肽。</p>
-        <div class="v4-actions"><a>多组学研究</a><a>最新进展</a></div>
+        <div class="v4-actions"><a href="./research.html">多组学研究</a><a href="./updates.html">最新进展</a></div>
       </div>
     </section>
 
@@ -811,7 +831,7 @@
   <section class="v4-section v4-wide v4-reveal" id="v4-research">
     <div class="v4-section-head">
       <div><span class="v4-kicker">Research</span><h4>我们关注的问题</h4></div>
-      <a>查看研究方向 →</a>
+      <a href="./research.html">查看研究方向 →</a>
     </div>
     <div class="research-grid">
       <article class="research-card">
@@ -873,7 +893,7 @@
     <div class="v4-inner">
       <div class="v4-section-head">
         <div><span class="v4-kicker">Latest</span><h4>最新进展</h4></div>
-        <a>查看全部 →</a>
+        <a href="./updates.html">查看全部 →</a>
       </div>
       <div class="latest-grid">
         <article class="featured-update"><div><span>重点进展 · 2026.07</span><h5>这里展示当前最值得关注的一项论文、项目或数据资源</h5></div></article>
@@ -889,7 +909,7 @@
 
   <section class="v4-join v4-inner v4-reveal" id="v4-join">
     <div><h4>和我们一起研究生命数据</h4><p>欢迎对病原生物信息学、机器学习和多组学研究感兴趣的同学加入。</p></div>
-    <a>了解招生信息 →</a>
+    <a href="./join.html">了解招生信息 →</a>
   </section>
 
   <footer class="v4-footer">
@@ -908,22 +928,11 @@
       </svg>
       <span>ML × OMICS</span>
     </div>
-    <a class="active" href="#v4-home"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg><span>概览</span></a>
-    <a href="#v4-research"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m7.5 11 9-4M7.5 13l9 4"/></svg><span>研究</span></a>
-    <a href="#v4-latest"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M7 15l4-4 3 2 5-7"/></svg><span>进展</span></a>
-    <a href="#v4-join"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-4 2.5-6 5.5-6s4.8 2 5.5 6M18 10v6M15 13h6"/></svg><span>加入</span></a>
+    <a class="active" href="./index.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><rect x="14" y="14" width="6" height="6"/></svg><span>概览</span></a>
+    <a href="./research.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="6" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m7.5 11 9-4M7.5 13l9 4"/></svg><span>研究</span></a>
+    <a href="./updates.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M7 15l4-4 3 2 5-7"/></svg><span>进展</span></a>
+    <a href="./join.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.7-4 2.5-6 5.5-6s4.8 2 5.5 6M18 10v6M15 13h6"/></svg><span>加入</span></a>
   </nav>
-</div>
-
-<div class="options v4-review">
-  <div class="option" data-choice="dynamic-v4-approved" onclick="toggleSelect(this)">
-    <div class="letter">✓</div>
-    <div class="content"><h3>动态与密度合适</h3><p>以此版本作为首页视觉参考</p></div>
-  </div>
-  <div class="option" data-choice="dynamic-v4-revise" onclick="toggleSelect(this)">
-    <div class="letter">↻</div>
-    <div class="content"><h3>还需调整</h3><p>请在终端指出轮播、字号、密度或配色问题</p></div>
-  </div>
 </div>
 
 <script>
@@ -984,34 +993,6 @@
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".update-row")) closeUpdates();
     });
-
-    const sectionLinks = [...root.querySelectorAll('a[href^="#v4-"]')];
-    sectionLinks.forEach((link) => {
-      link.addEventListener("click", (event) => {
-        const target = document.querySelector(link.getAttribute("href"));
-        if (!target) return;
-        event.preventDefault();
-        target.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-      });
-    });
-    const setActiveSection = (id) => {
-      sectionLinks.forEach((link) => {
-        const activeLink = link.getAttribute("href") === `#${id}`;
-        link.classList.toggle("active", activeLink);
-        if (activeLink) link.setAttribute("aria-current", "location");
-        else link.removeAttribute("aria-current");
-      });
-    };
-    if ("IntersectionObserver" in window) {
-      const sectionObserver = new IntersectionObserver((entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting);
-        if (visible.length) setActiveSection(visible.at(-1).target.id);
-      }, { rootMargin: "-24% 0px -66% 0px" });
-      ["v4-home", "v4-research", "v4-latest", "v4-join", "v4-team"].forEach((id) => {
-        const section = document.getElementById(id);
-        if (section) sectionObserver.observe(section);
-      });
-    }
 
     const reveals = root.querySelectorAll(".v4-reveal");
     if (reduceMotion || !("IntersectionObserver" in window)) {
