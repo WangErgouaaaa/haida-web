@@ -1,5 +1,7 @@
 <script setup lang="ts">
 // 成员详情页:完整个人资料(教育背景/项目/论文/荣誉等,数据来自数据库 detail JSON)
+import { sanitizeUrl } from '~/utils/url'
+
 const route = useRoute()
 const id = String(route.params.id)
 
@@ -32,6 +34,8 @@ const siteName = computed(() => settings.value?.site_name || '机器学习与多
 // GitHub Pages 子路径部署: 数据库中的 /assets/... 路径需要带 baseURL
 const baseURL = useRuntimeConfig().app.baseURL
 const assetUrl = (p: string) => (p.startsWith('/') ? `${baseURL}${p.slice(1)}` : p)
+// 数据库 URL 一律经 sanitizeUrl 净化,非法 scheme(javascript: 等)置空,不渲染链接
+const safeWebsite = computed(() => sanitizeUrl(member.value?.website || ''))
 </script>
 
 <template>
@@ -57,7 +61,7 @@ const assetUrl = (p: string) => (p.startsWith('/') ? `${baseURL}${p.slice(1)}` :
           <p class="member-head-bio">{{ member.bio }}</p>
           <div class="member-head-links">
             <a v-if="member.email" class="member-email" :href="`mailto:${member.email}`">{{ member.email }}</a>
-            <a v-if="member.website" class="member-email" :href="member.website" target="_blank" rel="noopener">学院官网主页 ↗</a>
+            <a v-if="safeWebsite" class="member-email" :href="safeWebsite" target="_blank" rel="noopener">学院官网主页 ↗</a>
             <NuxtLink to="/members" class="member-email back-link">← 返回团队成员</NuxtLink>          </div>
         </div>
       </div>

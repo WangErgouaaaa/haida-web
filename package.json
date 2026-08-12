@@ -10,7 +10,7 @@
     "db:seed": "node server/db/seed.mjs",
     "db:reset": "node server/db/reset.mjs",
     "typecheck": "nuxt typecheck",
-    "test": "vitest run"
+    "test": "nuxt prepare && vitest run"
   },
   "dependencies": {
     "docx-preview": "^0.4.0",

@@ -1,24 +1,17 @@
-import { appendFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import type { NitroErrorHandler } from 'nitropack'
 
 /**
- * 全局错误处理器:把未被 Nuxt 页面错误页捕获的服务端错误完整记录到
- * server-error.log(consola 会截断长行,这里直接写文件),便于定位 500 根因。
+ * 全局错误处理器:只向 stderr 输出 5xx 服务端错误(含堆栈),供运行平台采集。
+ * 不落盘 —— 4xx 属客户端错误,匿名扫描请求不值得记录;
+ * 也不再使用 appendFileSync(同步 IO 会阻塞事件循环,且无轮转/大小上限,
+ * 恶意打满 400 即可无限写盘)。日志收集与轮转交给部署平台负责。
  */
 const errorHandler: NitroErrorHandler = function (error, event) {
+  const status = error.statusCode || 500
+  if (status < 500) return
   const url = event?.path || event?.node?.req?.url || '(unknown)'
-  const detail = [
-    `[server-error] ${error.statusCode || 500} ${error.statusMessage || error.message} @ ${url}`,
-    error.cause ? `[server-error] cause: ${error.cause}` : '',
-    String(error.stack || error),
-  ].join('\n')
-  try {
-    appendFileSync(resolve(process.cwd(), 'server-error.log'), `${detail}\n\n`)
-  } catch {
-    /* 日志写入失败不阻断请求 */
-  }
-  console.error(`[server-error] ${error.statusCode || 500} ${error.message} @ ${url}`)
+  console.error(`[server-error] ${status} ${error.statusMessage || error.message} @ ${url}`)
+  if (error.stack) console.error(error.stack)
 }
 
 export default errorHandler
