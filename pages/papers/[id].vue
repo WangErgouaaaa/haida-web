@@ -68,7 +68,8 @@ async function renderPaper() {
 watch(
   () => paper.value?.paper_file,
   (file) => {
-    if (file) renderPaper()
+    // docx-preview 是浏览器库,SSR/预渲染阶段不执行(静态构建时页面已内嵌 payload)
+    if (import.meta.client && file) renderPaper()
   },
 )
 

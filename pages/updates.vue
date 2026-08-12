@@ -1,7 +1,13 @@
 <script setup lang="ts">
 // 最新进展页:完整时间线(数据来自数据库)
+// 论文预览图在服务端(构建/SSR)随 payload 一并下发,页面不再请求 /api/updates/:id/images
 useHead({ title: '最新进展｜机器学习与多组学分析研究团队' })
 
+interface PaperImageItem {
+  name: string
+  url: string
+  size: number
+}
 interface UpdateItem {
   id: number
   date: string
@@ -14,8 +20,9 @@ interface UpdateItem {
   featured: number
   featured_badge: string
   paper_file: string
+  images?: PaperImageItem[]
 }
-const { data: updates } = await useFetch<UpdateItem[]>('/api/updates')
+const { data: updates } = await useFetch<UpdateItem[]>('/api/updates?with_images=1')
 const { data: settings } = await useFetch('/api/settings')
 const heroTitle = computed(() => settings.value?.updates_hero_title || '记录研究、资源与团队的新进展')
 const heroText = computed(() => settings.value?.updates_hero_text || '按论文、项目、数据资源和团队动态分类，记录团队的最新动态。')
@@ -25,37 +32,19 @@ function formatDate(dateStr: string): string {
   return dateStr.replace(/-/g, '.')
 }
 
-/* ---------- 论文链接悬浮预览窗 ---------- */
-interface PaperImageItem {
-  name: string
-  url: string
-  size: number
-}
+// GitHub Pages 子路径部署: 静态/API 图片 URL 都需要带 baseURL
+const baseURL = useRuntimeConfig().app.baseURL
+const assetUrl = (p: string) => `${baseURL}${p.replace(/^\//, '')}`
 
+/* ---------- 论文链接悬浮预览窗 ---------- */
 const tip = reactive({
   show: false,
   x: 0,
   y: 0,
-  forId: 0,
-  loading: false,
   images: [] as PaperImageItem[],
   title: '',
   summary: '',
 })
-
-// 图片列表按论文 id 做会话级缓存,避免反复请求
-const imgCache = new Map<number, Promise<PaperImageItem[]>>()
-
-function fetchPaperImages(id: number): Promise<PaperImageItem[]> {
-  let p = imgCache.get(id)
-  if (!p) {
-    p = $fetch<{ images: PaperImageItem[] }>(`/api/updates/${id}/images`)
-      .then((r) => r.images)
-      .catch(() => [])
-    imgCache.set(id, p)
-  }
-  return p
-}
 
 const POP_W = 480 // 与 CSS 中 .paper-preview-pop 的 width 保持一致
 const POP_H_EST = 230 // 估算高度:图片条 + 标题,用于视口边界钳制
@@ -71,19 +60,11 @@ function positionTip(e: MouseEvent) {
 }
 
 function onPaperEnter(up: UpdateItem, e: MouseEvent) {
-  tip.forId = up.id
   tip.title = up.preview_title || up.title
   tip.summary = up.summary
+  tip.images = up.images || []
   tip.show = true
-  tip.loading = true
-  tip.images = []
   positionTip(e)
-  fetchPaperImages(up.id).then((imgs) => {
-    // 防止快速在多个链接间移动时,旧请求结果覆盖新链接
-    if (tip.forId !== up.id) return
-    tip.loading = false
-    tip.images = imgs
-  })
 }
 
 function onPaperMove(e: MouseEvent) {
@@ -92,8 +73,6 @@ function onPaperMove(e: MouseEvent) {
 
 function onPaperLeave() {
   tip.show = false
-  tip.forId = 0
-  tip.loading = false
   tip.images = []
 }
 </script>
@@ -155,12 +134,11 @@ function onPaperLeave() {
         role="tooltip"
         :style="{ left: tip.x + 'px', top: tip.y + 'px' }"
       >
-        <div v-if="tip.loading" class="paper-preview-state">正在加载论文图片…</div>
-        <div v-else-if="tip.images.length" class="paper-preview-imgs">
+        <div v-if="tip.images.length" class="paper-preview-imgs">
           <img
             v-for="img in tip.images.slice(0, 3)"
             :key="img.url"
-            :src="img.url"
+            :src="assetUrl(img.url)"
             :alt="tip.title"
             loading="lazy"
           >

@@ -5,9 +5,7 @@ node_modules/
 .nuxt/
 .output/
 .data/
-
-# dist/ 为已提交的静态构建产物(GitHub Pages 部署用),不再忽略
-# dist/
+dist/
 
 # database (git 忽略,内容由 db:seed 生成)
 data/*.db
@@ -22,3 +20,7 @@ preview.log
 # env
 .env
 .env.*
+
+# generated static preview images (pregen-images.mjs, regenerated in CI)
+public/updates-images/
+server-error.log

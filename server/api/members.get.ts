@@ -1,22 +1,25 @@
 import { queryAll } from '../db/database'
+import { groupMembers } from '../lib/members'
 
-/** GET /api/members —— 全部成员,按角色分组(与 lab-site 一致) */
+/** GET /api/members —— 全部成员,按角色分组(标准角色 + 自定义角色恒返回) */
 export default defineEventHandler(() => {
-  const rows = queryAll<Record<string, unknown>>(
+  const rows = queryAll<{
+    id: number
+    name: string
+    name_en: string
+    role: string
+    position: string
+    email: string
+    website: string
+    bio: string
+    photo: string
+    avatar_text: string
+    sort_order: number
+  }>(
     `SELECT id, name, name_en, role, position, email, website, bio, photo, avatar_text, sort_order
      FROM members
      WHERE visible = 1
      ORDER BY sort_order ASC, id ASC`,
   )
-  const order = ['PI', 'Postdoc', 'PhD', 'Master', 'RA', 'Alumni']
-  const groups = new Map<string, typeof rows>()
-  for (const row of rows) {
-    const role = String(row.role || 'Other')
-    if (!groups.has(role)) groups.set(role, [])
-    groups.get(role)!.push(row)
-  }
-  return {
-    groups: order.filter((r) => groups.has(r)).map((r) => ({ role: r, items: groups.get(r)! })),
-    others: order.filter((r) => !groups.has(r)).length ? [...groups.entries()].filter(([r]) => !order.includes(r)).map(([role, items]) => ({ role, items })) : [],
-  }
+  return groupMembers(rows)
 })

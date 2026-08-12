@@ -3,7 +3,7 @@
  * - 懒加载单例,首次使用时自动建表
  * - 数据库路径默认 data/haida.db,可用环境变量 LAB_DB_PATH 覆盖
  */
-import { DatabaseSync } from 'node:sqlite'
+import { DatabaseSync, type SQLInputValue } from 'node:sqlite'
 import { mkdirSync, existsSync } from 'node:fs'
 import { resolve, dirname } from 'node:path'
 import { SCHEMA } from './schema.mjs'
@@ -44,6 +44,9 @@ export function getDb(): DatabaseSync {
   if (_db) return _db
   const path = resolveDbPath()
   _db = new DatabaseSync(path)
+  // 预渲染/SSR 会以多进程并发打开同一数据库:
+  // busy_timeout 让 WAL/建表等写操作在锁竞争时等待而非立即报 SQLITE_BUSY(500)
+  _db.exec('PRAGMA busy_timeout = 10000;')
   _db.exec('PRAGMA journal_mode = WAL;')
   // 首次启动自动建表
   _db.exec(SCHEMA)
@@ -53,17 +56,17 @@ export function getDb(): DatabaseSync {
 }
 
 /** 查询多行 */
-export function queryAll<T = Record<string, unknown>>(sql: string, ...params: unknown[]): T[] {
+export function queryAll<T = Record<string, unknown>>(sql: string, ...params: SQLInputValue[]): T[] {
   return getDb().prepare(sql).all(...params) as T[]
 }
 
 /** 查询单行 */
-export function queryOne<T = Record<string, unknown>>(sql: string, ...params: unknown[]): T | undefined {
+export function queryOne<T = Record<string, unknown>>(sql: string, ...params: SQLInputValue[]): T | undefined {
   return getDb().prepare(sql).get(...params) as T | undefined
 }
 
 /** 写入(INSERT/UPDATE/DELETE),返回 lastInsertRowid / changes */
-export function execute(sql: string, ...params: unknown[]) {
+export function execute(sql: string, ...params: SQLInputValue[]) {
   return getDb().prepare(sql).run(...params)
 }
 

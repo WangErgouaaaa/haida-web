@@ -1,6 +1,5 @@
-import { extname } from 'node:path'
 import { queryOne } from '../../../../db/database'
-import { getPaperImageEntries, IMAGE_MIME } from '../../../../lib/paper-images'
+import { getPaperImageEntries, imageMimeFor } from '../../../../lib/paper-images'
 
 /**
  * GET /api/updates/:id/images/:index —— 返回论文第 index 张关键图的二进制内容
@@ -24,8 +23,7 @@ export default defineEventHandler(async (event) => {
   if (!image) {
     throw createError({ statusCode: 404, statusMessage: 'Image not found' })
   }
-  const type = IMAGE_MIME[extname(image.name).slice(1).toLowerCase()] ?? 'application/octet-stream'
-  setHeader(event, 'content-type', type)
+  setHeader(event, 'content-type', imageMimeFor(image.name))
   setHeader(event, 'cache-control', 'public, max-age=3600')
   return image.data
 })

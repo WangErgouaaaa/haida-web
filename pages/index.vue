@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // 首页:hero 轮播 + 信号条 + 研究方向卡片 + 最新进展 + 加入 CTA + 快捷导航
 // 所有内容来自数据库 API,通过 seed 脚本初始化
+import { sanitizeToText } from '~/utils/text'
+
 useHead({ title: '机器学习与多组学分析研究团队 | 海南大学生命健康学院' })
 
 interface HeroSlide {
@@ -65,7 +67,7 @@ const researchImages: Record<string, string> = {
   '04': assetUrl('/assets/research/resistance.jpg'),
 }
 function researchImage(area: ResearchArea): string {
-  return researchImages[area.number] || researchImages['01']
+  return researchImages[area.number] || researchImages['01'] || ''
 }
 
 // ---------- 客户端交互(轮播/浮层/滚动显现) ----------
@@ -193,7 +195,7 @@ onBeforeUnmount(() => clearInterval(timer))
         </svg>
         <div class="v4-hero-copy">
           <span class="v4-kicker">{{ slide.kicker }}</span>
-          <h3 v-html="slide.title"></h3>
+          <h3>{{ sanitizeToText(slide.title) }}</h3>
           <p>{{ slide.text }}</p>
           <div class="v4-actions">
             <NuxtLink v-if="slide.action1_text" :to="slide.action1_url">{{ slide.action1_text }}</NuxtLink>

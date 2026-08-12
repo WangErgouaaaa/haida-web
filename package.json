@@ -6,13 +6,21 @@
     "dev": "nuxt dev",
     "build": "nuxt build",
     "preview": "nuxt preview",
-    "generate": "nuxt generate",
+    "generate": "node scripts/pregen-images.mjs && nuxt generate",
     "db:seed": "node server/db/seed.mjs",
-    "db:reset": "node server/db/reset.mjs"
+    "db:reset": "node server/db/reset.mjs",
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
   },
   "dependencies": {
     "docx-preview": "^0.4.0",
     "jszip": "^3.10.1",
     "nuxt": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "typescript": "^5.6.3",
+    "vitest": "^3.2.4",
+    "vue-tsc": "^2.2.12"
   }
 }
