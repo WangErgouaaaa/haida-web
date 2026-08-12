@@ -7,6 +7,9 @@
 const EXTERNAL_RE = /^https?:\/\/\S/i
 // 站内相对路径:以单个 / 开头(排除 //host 协议相对 URL,它会解析为外部 http(s) 地址)
 const INTERNAL_RE = /^\/(?!\/)/
+// 反斜杠与控制字符:浏览器会把 \ 当 / 归一化(如 /\evil.example.com → //evil.example.com,
+// 解析为外部 http(s) 地址),控制字符可用于载荷混淆/截断,一律在共享边界拒绝
+const FORBIDDEN_RE = /[\\\u0000-\u001F\u007F]/
 
 /**
  * 校验并放行安全的链接地址:
@@ -18,6 +21,7 @@ const INTERNAL_RE = /^\/(?!\/)/
 export function sanitizeUrl(input: string): string {
   if (!input) return ''
   const url = input.trim()
+  if (FORBIDDEN_RE.test(url)) return ''
   if (INTERNAL_RE.test(url)) return url
   if (EXTERNAL_RE.test(url)) return url
   return ''

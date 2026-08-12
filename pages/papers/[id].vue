@@ -76,7 +76,7 @@ watch(
   },
 )
 
-// DOM 挂载后首次渲染(ssr:false 下为客户端挂载)
+// DOM 挂载后首次渲染(页面保持 SSR,docx 渲染在浏览器端执行)
 onMounted(() => {
   if (paper.value?.paper_file) renderPaper()
 })

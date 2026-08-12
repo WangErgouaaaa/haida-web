@@ -52,6 +52,20 @@ describe('sanitizeUrl —— 数据库 URL 防点击型 XSS', () => {
     expect(sanitizeUrl('//evil.example.com')).toBe('')
   })
 
+  it('拒绝反斜杠变体(浏览器将 \\ 归一化为 /,斜杠后跟反斜杠可跳转外站)', () => {
+    // /\evil.example.com 会被浏览器解析为 //evil.example.com → https://evil.example.com/
+    expect(sanitizeUrl('/\\evil.example.com')).toBe('')
+    expect(sanitizeUrl('https://evil.example.com/\\')).toBe('')
+    expect(sanitizeUrl('\\evil.example.com')).toBe('')
+    expect(sanitizeUrl('https://evil.example.com\\path')).toBe('')
+  })
+
+  it('拒绝控制字符(防载荷混淆与截断)', () => {
+    expect(sanitizeUrl('/\u0000evil')).toBe('')
+    expect(sanitizeUrl('http://evil.example.com/\u0001x')).toBe('')
+    expect(sanitizeUrl('https://evil.example.com/\u0008')).toBe('')
+  })
+
   it('空输入返回空串', () => {
     expect(sanitizeUrl('')).toBe('')
     expect(sanitizeUrl(undefined as unknown as string)).toBe('')

@@ -2,6 +2,7 @@
 // 首页:hero 轮播 + 信号条 + 研究方向卡片 + 最新进展 + 加入 CTA + 快捷导航
 // 所有内容来自数据库 API,通过 seed 脚本初始化
 import { sanitizeToText } from '~/utils/text'
+import { sanitizeUrl } from '~/utils/url'
 
 useHead({ title: '机器学习与多组学分析研究团队 | 海南大学生命健康学院' })
 
@@ -47,6 +48,12 @@ const { data: updates } = await useFetch<UpdateItem[]>('/api/updates?limit=4')
 const { data: settings } = await useFetch('/api/settings')
 
 const featuredUpdate = computed(() => featured.value?.[0] || null)
+// hero action 链接复用共享校验:非法/空值置空,模板据此不渲染链接
+const safeSlides = computed(() => (slides.value || []).map((s) => ({
+  ...s,
+  action1_url: sanitizeUrl(s.action1_url),
+  action2_url: sanitizeUrl(s.action2_url),
+})))
 const siteName = computed(() => settings.value?.site_name || '机器学习与多组学分析研究团队')
 const joinText = computed(() => settings.value?.site_join_text || '')
 const joinCtaText = computed(() => settings.value?.join_cta_text || '了解招生信息 →')
@@ -166,7 +173,7 @@ onBeforeUnmount(() => clearInterval(timer))
     <!-- Hero 轮播 -->
     <header class="v4-hero" id="v4-home" aria-label="团队重点内容轮播">
       <section
-        v-for="(slide, i) in slides"
+        v-for="(slide, i) in safeSlides"
         :key="slide.id"
         class="v4-slide"
         :class="[`slide-${slide.visual}`, { active: i === 0 }]"
@@ -198,15 +205,15 @@ onBeforeUnmount(() => clearInterval(timer))
           <h3>{{ sanitizeToText(slide.title) }}</h3>
           <p>{{ slide.text }}</p>
           <div class="v4-actions">
-            <NuxtLink v-if="slide.action1_text" :to="slide.action1_url">{{ slide.action1_text }}</NuxtLink>
-            <NuxtLink v-if="slide.action2_text" :to="slide.action2_url">{{ slide.action2_text }}</NuxtLink>
+            <NuxtLink v-if="slide.action1_text && slide.action1_url" :to="slide.action1_url">{{ slide.action1_text }}</NuxtLink>
+            <NuxtLink v-if="slide.action2_text && slide.action2_url" :to="slide.action2_url">{{ slide.action2_text }}</NuxtLink>
           </div>
         </div>
       </section>
 
       <div class="hero-controls">
         <button
-          v-for="(slide, i) in slides"
+          v-for="(slide, i) in safeSlides"
           :key="`dot-${slide.id}`"
           class="hero-dot"
           :class="{ active: i === 0 }"
