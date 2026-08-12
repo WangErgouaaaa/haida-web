@@ -1,6 +1,8 @@
 <script setup lang="ts">
-// 论文在线阅读页:站内渲染 DOCX(客户端渲染,routeRules 已对 /papers/** 关闭 SSR)
-// 依赖 docx-preview 在浏览器中解析并分页渲染 Word 文档
+// 论文在线阅读页:站内渲染 DOCX(docx-preview 仅在浏览器端解析渲染)
+// 页面保持 SSR:静态构建时 /papers/:id 由服务端预渲染、论文文件路径内嵌到 payload,
+// GitHub Pages 上浏览器直接读取 public/ 下的静态 DOCX 文件,不请求任何 /api。
+// 注意:不要对该路由关闭 SSR,否则静态站会退化为客户端运行时请求 /api/* 而 404。
 useHead({ title: '论文阅读｜机器学习与多组学分析研究团队' })
 
 interface UpdateDetail {
@@ -69,6 +71,7 @@ watch(
   () => paper.value?.paper_file,
   (file) => {
     // docx-preview 是浏览器库,SSR/预渲染阶段不执行(静态构建时页面已内嵌 payload)
+    // 页面为 SSR(无 ssr:false),payload 在构建期已写入,浏览器端不触发 /api 请求
     if (import.meta.client && file) renderPaper()
   },
 )
