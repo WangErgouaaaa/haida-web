@@ -664,6 +664,36 @@ a { color: inherit; }
   line-height: 1.4 !important;
 }
 
+/* PDF 页渲染(pdf.js):每页一张白纸,阴影衬托,页间留白 */
+.paper-pdf-page {
+  margin: 0 auto 26px;
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(8, 31, 76, .12);
+  position: relative;
+  overflow: hidden;
+}
+.paper-pdf-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.paper-pdf-page-error {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* PDF 懒渲染进度提示 */
+.paper-pdf-progress {
+  margin: 18px auto 0;
+  max-width: 1000px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
 .paper-stage-hint {
   display: grid;
   place-items: center;

@@ -61,7 +61,7 @@ haida-web-backend/
 │   └── join.vue            # 加入我们
 ├── utils/text.ts           # sanitizeToText:数据库内容安全文本化(防存储型 XSS)
 ├── public/assets/          # 静态素材(院徽/helix/实验室图片)
-├── public/files/papers/    # 论文 DOCX 原文
+├── public/files/papers/    # 论文 DOCX 原文(可选附同名 PDF 官方版式)
 ├── server/
 │   ├── db/
 │   │   ├── schema.mjs      # 建表 SQL(唯一数据源)
@@ -139,6 +139,9 @@ sqlite3 data/haida.db "UPDATE members SET visible=0 WHERE id=5;"
 - `updates.category`:`Research` / `Resource` / `Team` / `Project`,配套 `category_zh` 中文标签
 - `updates.paper_file`:相对 `public/` 的 DOCX 路径(如 `files/papers/xxx.docx`),
   页面自动生成论文阅读页 + 悬浮预览图;仅支持 `.docx`/`.zip`,路径不可逃逸 `public/`
+- **官方版式 PDF(推荐)**:在 DOCX 同目录放同名 `.pdf`(如 `files/papers/xxx.pdf`),
+  论文阅读页会**优先用 pdf.js 渲染 PDF**(版式与出版社一致),DOCX 仅作兜底与预览图提取;
+  下载按钮也会自动切换为下载 PDF。PDF 渲染为浏览器端懒加载,不影响静态构建。
 - `updates.featured`=1 且 `featured_badge` 非空 → 显示在首页「重点进展」大图
 - `hero_slides.visual`:`photo` / `network` / `heatmap` 三种视觉
 - **安全约定**:所有数据库文本都以纯文本渲染,`<br>` 自动转成换行,其余 HTML 一律剥离
