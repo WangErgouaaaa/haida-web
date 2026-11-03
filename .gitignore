@@ -1,3 +1,26 @@
-.omx/
-.superpowers/
-.DS_Store
+# dependencies
+node_modules/
+
+# Nuxt
+.nuxt/
+.output/
+.data/
+dist/
+
+# database (git 忽略,内容由 db:seed 生成)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# logs
+*.log
+dev.log
+preview.log
+
+# env
+.env
+.env.*
+
+# generated static preview images (pregen-images.mjs, regenerated in CI)
+public/updates-images/
+server-error.log

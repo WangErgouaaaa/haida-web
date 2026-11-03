@@ -1,0 +1,87 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+# Pages 部署权限:只读代码 + 写 Pages artifact + OIDC token
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时间只允许一个 Pages 部署,新推送取消进行中的旧部署
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    name: Seed → Generate → Assert → Deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout preserved pre-PR site
+        uses: actions/checkout@v4
+        with:
+          repository: WangErgouaaaa/haida-web
+          ref: 019bcb0e2e2bb4311863e2bfb9e34ac51029c61d
+          path: before-src
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Nuxt 需要 22.19+,也满足 pdfjs-dist 的要求
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Seed fresh database (CI 从零生成,杜绝空库产物)
+        run: npm run db:seed
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit & integration tests
+        run: npm test
+
+      - name: Generate static site
+        run: npm run generate
+        env:
+          NUXT_APP_BASE_URL: /haida-web/after/
+
+      - name: Assert static artifacts
+        run: node scripts/assert-dist.mjs
+
+      - name: Assemble before and after site
+        run: |
+          mkdir -p comparison-site/before comparison-site/after
+          cp -R before-src/assets before-src/*.html comparison-site/
+          cp before-src/.nojekyll comparison-site/.nojekyll
+          cp -R before-src/assets before-src/*.html comparison-site/before/
+          cp -R .output/public/. comparison-site/after/
+          test -f comparison-site/index.html
+          test -f comparison-site/before/index.html
+          test -f comparison-site/after/index.html
+          test -f comparison-site/.nojekyll
+          grep -Fq '/haida-web/after/_nuxt/' comparison-site/after/index.html
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: comparison-site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
